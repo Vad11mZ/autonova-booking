@@ -1,0 +1,21 @@
+{% extends 'booking/base.html' %}
+{% block title %}Вход — AutoNova{% endblock %}
+{% block content %}
+<section class="container auth-page">
+    <div class="auth-card">
+        <span class="eyebrow">Единый вход</span>
+        <h1>Вход для клиентов и сотрудников</h1>
+        <p>Используйте один экран входа. Доступные разделы будут открыты автоматически по роли пользователя.</p>
+        <form method="post" class="form-card">
+            {% csrf_token %}
+            {{ form.non_field_errors }}
+            {% for field in form %}
+                <label>{{ field.label }}{{ field }}</label>
+                {% for error in field.errors %}<small class="error">{{ error }}</small>{% endfor %}
+            {% endfor %}
+            <button class="btn primary full" type="submit">Войти</button>
+        </form>
+        <p class="muted">Нет аккаунта клиента? <a href="{% url 'booking:register' %}">Зарегистрируйтесь</a>.</p>
+    </div>
+</section>
+{% endblock %}

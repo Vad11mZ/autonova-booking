@@ -1,0 +1,36 @@
+{% extends 'booking/base.html' %}
+{% block title %}Каталог автомобилей — AutoNova{% endblock %}
+{% block content %}
+<section class="container section">
+    <div class="section-head">
+        <div>
+            <span class="eyebrow">Каталог</span>
+            <h1>Автомобили для бронирования</h1>
+            <p>Выберите автомобиль и проверьте доступность по датам.</p>
+        </div>
+    </div>
+
+    <form class="filter-bar" method="get">
+        <input type="search" name="q" placeholder="Марка, модель или описание" value="{{ q }}">
+        <select name="category">
+            <option value="">Все классы</option>
+            {% for item in categories %}<option value="{{ item }}" {% if selected_category == item %}selected{% endif %}>{{ item }}</option>{% endfor %}
+        </select>
+        <select name="transmission">
+            <option value="">Любая КПП</option>
+            <option value="AT" {% if selected_transmission == 'AT' %}selected{% endif %}>Автомат</option>
+            <option value="MT" {% if selected_transmission == 'MT' %}selected{% endif %}>Механика</option>
+            <option value="ROBOT" {% if selected_transmission == 'ROBOT' %}selected{% endif %}>Робот</option>
+        </select>
+        <button class="btn primary" type="submit">Найти</button>
+    </form>
+
+    <div class="cars-grid">
+        {% for car in cars %}
+            {% include 'booking/includes/car_card.html' %}
+        {% empty %}
+            <div class="panel"><p>По выбранным параметрам ничего не найдено.</p></div>
+        {% endfor %}
+    </div>
+</section>
+{% endblock %}

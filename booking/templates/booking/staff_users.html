@@ -1,0 +1,39 @@
+{% extends 'booking/base.html' %}
+{% block title %}Пользователи — AutoNova{% endblock %}
+{% block content %}
+<section class="container section">
+    <div class="section-head">
+        <div>
+            <span class="eyebrow">Администратор</span>
+            <h1>Пользователи и роли</h1>
+            <p>Клиенты регистрируются сами, сотрудников назначает администратор.</p>
+        </div>
+    </div>
+    <div class="panel table-wrap">
+        <table>
+            <thead><tr><th>Пользователь</th><th>Email</th><th>Роль</th><th>Телефон</th><th>Стаж</th><th>Изменить роль</th></tr></thead>
+            <tbody>
+            {% for profile in profiles %}
+                <tr>
+                    <td>{{ profile.user.get_full_name|default:profile.user.username }}<br><small>{{ profile.user.username }}</small></td>
+                    <td>{{ profile.user.email }}</td>
+                    <td>{{ profile.get_role_display }}</td>
+                    <td>{{ profile.phone }}</td>
+                    <td>{{ profile.license_years }} лет</td>
+                    <td>
+                        <form method="post" class="inline-actions">
+                            {% csrf_token %}
+                            <input type="hidden" name="profile_id" value="{{ profile.id }}">
+                            <select name="role">
+                                {% for value, title in roles %}<option value="{{ value }}" {% if profile.role == value %}selected{% endif %}>{{ title }}</option>{% endfor %}
+                            </select>
+                            <button class="btn primary" type="submit">Сохранить</button>
+                        </form>
+                    </td>
+                </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</section>
+{% endblock %}

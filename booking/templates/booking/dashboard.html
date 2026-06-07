@@ -1,0 +1,55 @@
+{% extends 'booking/base.html' %}
+{% block title %}Кабинет — AutoNova{% endblock %}
+{% block content %}
+<section class="container section">
+    <div class="section-head">
+        <div>
+            <span class="eyebrow">Личный кабинет</span>
+            <h1>Здравствуйте, {{ user.first_name|default:user.username }}</h1>
+            <p>Ваша роль: <b>{{ profile.get_role_display }}</b></p>
+        </div>
+        <a class="btn primary" href="{% url 'booking:cars' %}">Каталог авто</a>
+    </div>
+
+    {% if profile.role == 'CLIENT' %}
+        <div class="panel">
+            <h2>Последние бронирования</h2>
+            <div class="table-wrap">
+                <table>
+                    <thead><tr><th>Автомобиль</th><th>Период</th><th>Статус</th><th>Сумма</th></tr></thead>
+                    <tbody>
+                    {% for booking in bookings %}
+                        <tr><td>{{ booking.car.title }}</td><td>{{ booking.start_date }} — {{ booking.end_date }}</td><td>{{ booking.get_status_display }}</td><td>{{ booking.total_price|floatformat:0 }} ₽</td></tr>
+                    {% empty %}
+                        <tr><td colspan="4">У вас пока нет бронирований.</td></tr>
+                    {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            <a class="btn" href="{% url 'booking:my_bookings' %}">Открыть все бронирования</a>
+        </div>
+    {% else %}
+        <div class="stats-row staff">
+            <div class="stat"><strong>{{ stats.cars_total }}</strong><span>машин всего</span></div>
+            <div class="stat"><strong>{{ stats.cars_available }}</strong><span>доступно</span></div>
+            <div class="stat"><strong>{{ stats.bookings_pending }}</strong><span>заявок</span></div>
+            <div class="stat"><strong>{{ stats.revenue|floatformat:0 }} ₽</strong><span>подтверждено</span></div>
+        </div>
+        <div class="panel">
+            <h2>Последние заявки</h2>
+            <div class="table-wrap">
+                <table>
+                    <thead><tr><th>Клиент</th><th>Авто</th><th>Период</th><th>Статус</th></tr></thead>
+                    <tbody>
+                    {% for booking in recent_bookings %}
+                        <tr><td>{{ booking.user.username }}</td><td>{{ booking.car.title }}</td><td>{{ booking.start_date }} — {{ booking.end_date }}</td><td>{{ booking.get_status_display }}</td></tr>
+                    {% empty %}
+                        <tr><td colspan="4">Заявок пока нет.</td></tr>
+                    {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    {% endif %}
+</section>
+{% endblock %}

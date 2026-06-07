@@ -1,0 +1,29 @@
+{% extends 'booking/base.html' %}
+{% block title %}Аналитика — AutoNova{% endblock %}
+{% block content %}
+<section class="container section">
+    <div class="section-head">
+        <div>
+            <span class="eyebrow">Менеджмент</span>
+            <h1>Аналитика бронирований</h1>
+        </div>
+    </div>
+    <div class="stats-row staff">
+        <div class="stat"><strong>{{ stats.cars_total }}</strong><span>авто всего</span></div>
+        <div class="stat"><strong>{{ stats.cars_available }}</strong><span>доступно</span></div>
+        <div class="stat"><strong>{{ stats.bookings_confirmed }}</strong><span>подтверждено</span></div>
+        <div class="stat"><strong>{{ stats.revenue|floatformat:0 }} ₽</strong><span>выручка</span></div>
+    </div>
+    <div class="panel table-wrap">
+        <h2>Выручка по автомобилям</h2>
+        <table>
+            <thead><tr><th>Автомобиль</th><th>Класс</th><th>Цена/сутки</th><th>Выручка</th></tr></thead>
+            <tbody>
+            {% for car in cars_revenue %}
+                <tr><td>{{ car.title }}</td><td>{{ car.category }}</td><td>{{ car.price_per_day|floatformat:0 }} ₽</td><td>{{ car.revenue|default:0|floatformat:0 }} ₽</td></tr>
+            {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</section>
+{% endblock %}

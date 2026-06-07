@@ -1,0 +1,21 @@
+<article class="car-card">
+    <div class="car-card-visual">
+        {% if car.image_url %}
+            <img src="{{ car.image_url }}" alt="{{ car.title }}">
+        {% else %}
+            <span>{{ car.brand|slice:':1' }}{{ car.model|slice:':1' }}</span>
+        {% endif %}
+    </div>
+    <div class="car-card-body">
+        <div class="card-topline">
+            <span class="badge">{{ car.category }}</span>
+            {% with label=car.public_status %}
+                <span class="status {% if label == 'Свободен' %}ok{% elif label == 'Авто забронировано' %}busy{% else %}warn{% endif %}">{{ label }}</span>
+            {% endwith %}
+        </div>
+        <h3>{{ car.title }}</h3>
+        <p>{{ car.year }} г. • {{ car.get_transmission_display }} • {{ car.fuel_type }} • {{ car.seats }} мест</p>
+        <div class="price-line"><strong>{{ car.price_per_day|floatformat:0 }} ₽</strong><span>/ сутки</span></div>
+        <a class="btn full" href="{% url 'booking:car_detail' car.pk %}">Подробнее</a>
+    </div>
+</article>

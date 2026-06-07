@@ -1,0 +1,75 @@
+{% load static %}
+<!doctype html>
+<html lang="ru">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>{% block title %}AutoNova Booking{% endblock %}</title>
+    <link rel="stylesheet" href="{% static 'booking/css/style.css' %}?v=3">
+</head>
+<body>
+<header class="site-header">
+    <div class="container nav">
+        <a class="logo" href="{% url 'booking:home' %}">
+            <img class="logo-img" src="{% static 'booking/img/logo.svg' %}" alt="">
+            <span>AutoNova</span>
+        </a>
+        <nav class="nav-links">
+            <a href="{% url 'booking:cars' %}">Автомобили</a>
+            {% if user.is_authenticated %}
+                <a href="{% url 'booking:dashboard' %}">Кабинет</a>
+                {% if user.profile.role == 'CLIENT' %}
+                    <a href="{% url 'booking:my_bookings' %}">Мои брони</a>
+                {% endif %}
+                {% if user.profile.role == 'MANAGER' or user.profile.role == 'ADMIN' %}
+                    <a href="{% url 'booking:manager_bookings' %}">Заявки</a>
+                    <a href="{% url 'booking:analytics' %}">Аналитика</a>
+                {% endif %}
+                {% if user.profile.role == 'INSPECTOR' or user.profile.role == 'MANAGER' or user.profile.role == 'ADMIN' %}
+                    <a href="{% url 'booking:fleet_status' %}">Автопарк</a>
+                {% endif %}
+                {% if user.profile.role == 'ADMIN' %}
+                    <a href="{% url 'booking:staff_users' %}">Пользователи</a>
+                    <a href="/admin/">Django admin</a>
+                {% endif %}
+            {% endif %}
+        </nav>
+        <div class="auth-box">
+            {% if user.is_authenticated %}
+                <span class="role-chip">{{ user.profile.get_role_display }}</span>
+                <form method="post" action="{% url 'booking:logout' %}">{% csrf_token %}<button class="btn ghost" type="submit">Выйти</button></form>
+            {% else %}
+                <a class="btn ghost" href="{% url 'booking:login' %}">Войти</a>
+                <a class="btn primary" href="{% url 'booking:register' %}">Регистрация</a>
+            {% endif %}
+        </div>
+    </div>
+</header>
+
+{% if messages %}
+<div class="container messages">
+    {% for message in messages %}
+        <div class="message {{ message.tags }}">{{ message }}</div>
+    {% endfor %}
+</div>
+{% endif %}
+
+<main>
+    {% block content %}{% endblock %}
+</main>
+
+<footer class="site-footer">
+    <div class="container footer-grid">
+        <div>
+            <strong>AutoNova Booking</strong>
+            <p>Онлайн-бронирование автомобилей для городских поездок, командировок и путешествий.</p>
+        </div>
+        <div>
+            <p>API: <a href="/api/docs">/api/docs</a></p>
+            <p>Единый вход для клиентов и сотрудников</p>
+        </div>
+    </div>
+</footer>
+<script src="{% static 'booking/js/app.js' %}"></script>
+</body>
+</html>

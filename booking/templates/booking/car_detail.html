@@ -1,0 +1,66 @@
+{% extends 'booking/base.html' %}
+{% block title %}{{ car.title }} — AutoNova{% endblock %}
+{% block content %}
+<section class="container section car-detail-grid">
+    <div class="detail-visual{% if car.image_url %} has-photo{% endif %}">
+        {% if car.image_url %}
+            <img src="{{ car.image_url }}" alt="{{ car.title }}">
+        {% else %}
+            <div class="big-car-mark">{{ car.brand|slice:':1' }}{{ car.model|slice:':1' }}</div>
+        {% endif %}
+    </div>
+    <div class="detail-info">
+        <span class="badge">{{ car.category }}</span>
+        <h1>{{ car.title }}</h1>
+        <p>{{ car.description }}</p>
+        <div class="spec-grid">
+            <div><span>Год</span><strong>{{ car.year }}</strong></div>
+            <div><span>КПП</span><strong>{{ car.get_transmission_display }}</strong></div>
+            <div><span>Топливо</span><strong>{{ car.fuel_type }}</strong></div>
+            <div><span>Мест</span><strong>{{ car.seats }}</strong></div>
+            <div><span>Залог</span><strong>{{ car.deposit|floatformat:0 }} ₽</strong></div>
+            <div><span>Адрес</span><strong>{{ car.address }}</strong></div>
+        </div>
+        <div class="price-box">
+            <strong>{{ car.price_per_day|floatformat:0 }} ₽ / сутки</strong>
+            <span class="status {% if car.public_status == 'Свободен' %}ok{% elif car.public_status == 'Авто забронировано' %}busy{% else %}warn{% endif %}">{{ car.public_status }}</span>
+        </div>
+    </div>
+</section>
+
+<section class="container section split">
+    <div class="panel">
+        <h2>Занятые интервалы</h2>
+        <p class="muted">Если выбранные даты пересекаются с этими периодами, система не даст создать бронирование.</p>
+        <div class="period-list">
+            {% for item in active_periods %}
+                <span>{{ item.start_date }} — {{ item.end_date }} / {{ item.get_status_display }}</span>
+            {% empty %}
+                <span>Свободных ограничений нет. Можно бронировать.</span>
+            {% endfor %}
+        </div>
+    </div>
+
+    <div class="panel">
+        <h2>Забронировать автомобиль</h2>
+        {% if not user.is_authenticated %}
+            <p>Для бронирования войдите в аккаунт клиента.</p>
+            <a class="btn primary" href="{% url 'booking:login' %}">Войти</a>
+        {% elif user.profile.role != 'CLIENT' %}
+            <p>Сотрудники не создают клиентские бронирования из этого раздела.</p>
+        {% elif car.status != 'AVAILABLE' %}
+            <p>Автомобиль временно недоступен для бронирования.</p>
+        {% else %}
+            <form method="post" class="form-card" id="booking-form" data-car-id="{{ car.id }}">
+                {% csrf_token %}
+                {{ form.non_field_errors }}
+                {% for field in form %}
+                    <label>{{ field.label }}{{ field }}{% for error in field.errors %}<small class="error">{{ error }}</small>{% endfor %}</label>
+                {% endfor %}
+                <div id="availability-result" class="availability-result"></div>
+                <button class="btn primary full" type="submit">Отправить заявку</button>
+            </form>
+        {% endif %}
+    </div>
+</section>
+{% endblock %}

@@ -1,0 +1,40 @@
+{% extends 'booking/base.html' %}
+{% block title %}Автопарк — AutoNova{% endblock %}
+{% block content %}
+<section class="container section">
+    <div class="section-head">
+        <div>
+            <span class="eyebrow">Инспектор автопарка</span>
+            <h1>Технический статус автомобилей</h1>
+            <p>Инспектор может убрать машину с бронирования, если она находится на обслуживании.</p>
+        </div>
+    </div>
+    <div class="panel table-wrap">
+        <table>
+            <thead><tr><th>Автомобиль</th><th>Класс</th><th>Текущий статус</th><th>Броней</th><th>Публично</th><th>Изменить</th></tr></thead>
+            <tbody>
+            {% for car in cars %}
+                <tr>
+                    <td>{{ car.title }}</td>
+                    <td>{{ car.category }}</td>
+                    <td>{{ car.get_status_display }}</td>
+                    <td>{{ car.bookings_count }}</td>
+                    <td>{% if car.is_active %}Да{% else %}Нет{% endif %}</td>
+                    <td>
+                        <form method="post" class="inline-actions">
+                            {% csrf_token %}
+                            <input type="hidden" name="car_id" value="{{ car.id }}">
+                            <select name="status">
+                                {% for value, title in status_choices %}<option value="{{ value }}" {% if car.status == value %}selected{% endif %}>{{ title }}</option>{% endfor %}
+                            </select>
+                            <label class="check-line"><input type="checkbox" name="is_active" {% if car.is_active %}checked{% endif %}> показывать</label>
+                            <button class="btn primary" type="submit">Сохранить</button>
+                        </form>
+                    </td>
+                </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</section>
+{% endblock %}

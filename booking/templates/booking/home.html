@@ -1,0 +1,65 @@
+{% extends 'booking/base.html' %}
+{% block title %}AutoNova Booking — бронирование автомобилей{% endblock %}
+{% block content %}
+<section class="hero">
+    <div class="container hero-grid{% if not user.is_authenticated or user.profile.role == 'CLIENT' %} hero-grid-single{% endif %}">
+        <div class="hero-text">
+            <span class="eyebrow">Быстро / прозрачно / надежно</span>
+            <h1>Система бронирования автомобилей AutoNova</h1>
+            <p>Выбирайте автомобиль, проверяйте доступность и бронируйте онлайн. AutoNova помогает быстро подобрать машину под поездку и держит весь процесс бронирования в одном удобном кабинете.</p>
+            <div class="hero-actions">
+                <a class="btn primary large" href="{% url 'booking:cars' %}">Выбрать автомобиль</a>
+                {% if not user.is_authenticated %}<a class="btn light large" href="{% url 'booking:register' %}">Создать аккаунт клиента</a>{% endif %}
+            </div>
+        </div>
+        {% if user.is_authenticated and user.profile.role != 'CLIENT' %}
+        <div class="hero-card">
+            <div class="staff-preview"></div>
+            <h3>Рабочая сводка автопарка</h3>
+            <p>Для сотрудников доступны заявки, аналитика, статусы автомобилей и управление пользователями в зависимости от роли.</p>
+            <div class="mini-list">
+                <span>Заявки</span>
+                <span>Автопарк</span>
+                <span>Аналитика</span>
+            </div>
+        </div>
+        {% endif %}
+    </div>
+</section>
+
+{% if user.is_authenticated and user.profile.role != 'CLIENT' %}
+<section class="container stats-row">
+    <div class="stat"><strong>{{ stats.cars }}</strong><span>автомобилей</span></div>
+    <div class="stat"><strong>{{ stats.bookings }}</strong><span>бронирований</span></div>
+    <div class="stat"><strong>{{ stats.clients }}</strong><span>клиентов</span></div>
+</section>
+{% endif %}
+
+<section class="container section about-section">
+    <div>
+        <span class="eyebrow">О нас</span>
+        <h2>AutoNova подбирает автомобили под реальные планы</h2>
+    </div>
+    <div>
+        <p>Мы работаем с проверенным автопарком и понятными условиями бронирования. В каталоге собраны автомобили для повседневных поездок, деловых встреч, семейных маршрутов и выездов за город.</p>
+        <p>Каждая заявка проходит через единый кабинет: клиент видит свои бронирования, менеджер обрабатывает обращения, а инспектор следит за технической готовностью машин.</p>
+    </div>
+</section>
+
+<section class="container section">
+    <div class="section-head">
+        <div>
+            <span class="eyebrow">Каталог</span>
+            <h2>Популярные автомобили</h2>
+        </div>
+        <a href="{% url 'booking:cars' %}">Смотреть все →</a>
+    </div>
+    <div class="cars-grid">
+        {% for car in cars %}
+            {% include 'booking/includes/car_card.html' %}
+        {% empty %}
+            <p>Автомобили пока не добавлены.</p>
+        {% endfor %}
+    </div>
+</section>
+{% endblock %}

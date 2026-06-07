@@ -1,0 +1,48 @@
+{% extends 'booking/base.html' %}
+{% block title %}Управление заявками — AutoNova{% endblock %}
+{% block content %}
+<section class="container section">
+    <div class="section-head">
+        <div>
+            <span class="eyebrow">Менеджер</span>
+            <h1>Управление бронированиями</h1>
+        </div>
+    </div>
+    <form class="filter-bar" method="get">
+        <select name="status">
+            <option value="">Все статусы</option>
+            {% for value, title in statuses %}<option value="{{ value }}" {% if selected_status == value %}selected{% endif %}>{{ title }}</option>{% endfor %}
+        </select>
+        <button class="btn primary" type="submit">Показать</button>
+    </form>
+    <div class="panel table-wrap">
+        <table>
+            <thead><tr><th>№</th><th>Клиент</th><th>Автомобиль</th><th>Период</th><th>Сумма</th><th>Статус</th><th>Действие</th></tr></thead>
+            <tbody>
+            {% for booking in bookings %}
+                <tr>
+                    <td>#{{ booking.id }}</td>
+                    <td>{{ booking.user.get_full_name|default:booking.user.username }}<br><small>{{ booking.user.profile.phone }}</small></td>
+                    <td>{{ booking.car.title }}</td>
+                    <td>{{ booking.start_date }} — {{ booking.end_date }}</td>
+                    <td>{{ booking.total_price|floatformat:0 }} ₽</td>
+                    <td>{{ booking.get_status_display }}</td>
+                    <td>
+                        <form method="post" class="inline-actions">
+                            {% csrf_token %}
+                            <input type="hidden" name="booking_id" value="{{ booking.id }}">
+                            <input type="text" name="manager_comment" placeholder="Комментарий" value="{{ booking.manager_comment }}">
+                            {% if booking.status == 'PENDING' %}<button class="btn ok" name="action" value="confirm">Подтвердить</button>{% endif %}
+                            {% if booking.status == 'PENDING' or booking.status == 'CONFIRMED' %}<button class="btn danger" name="action" value="cancel">Отменить</button>{% endif %}
+                            {% if booking.status == 'CONFIRMED' %}<button class="btn" name="action" value="complete">Завершить</button>{% endif %}
+                        </form>
+                    </td>
+                </tr>
+            {% empty %}
+                <tr><td colspan="7">Бронирований нет.</td></tr>
+            {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</section>
+{% endblock %}

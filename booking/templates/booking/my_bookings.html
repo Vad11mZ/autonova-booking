@@ -1,0 +1,38 @@
+{% extends 'booking/base.html' %}
+{% block title %}Мои бронирования — AutoNova{% endblock %}
+{% block content %}
+<section class="container section">
+    <div class="section-head">
+        <div>
+            <span class="eyebrow">Клиент</span>
+            <h1>Мои бронирования</h1>
+        </div>
+        <a class="btn primary" href="{% url 'booking:cars' %}">Новое бронирование</a>
+    </div>
+    <div class="panel table-wrap">
+        <table>
+            <thead><tr><th>№</th><th>Автомобиль</th><th>Период</th><th>Статус</th><th>Сумма</th><th>Действие</th></tr></thead>
+            <tbody>
+            {% for booking in bookings %}
+                <tr>
+                    <td>#{{ booking.id }}</td>
+                    <td>{{ booking.car.title }}</td>
+                    <td>{{ booking.start_date }} — {{ booking.end_date }}<br><small>{{ booking.days_count }} дн.</small></td>
+                    <td>{{ booking.get_status_display }}</td>
+                    <td>{{ booking.total_price|floatformat:0 }} ₽</td>
+                    <td>
+                        {% if booking.status == 'PENDING' or booking.status == 'CONFIRMED' %}
+                            <form method="post" action="{% url 'booking:cancel_own_booking' booking.pk %}">{% csrf_token %}<button class="btn danger" type="submit">Отменить</button></form>
+                        {% else %}
+                            <span class="muted">—</span>
+                        {% endif %}
+                    </td>
+                </tr>
+            {% empty %}
+                <tr><td colspan="6">Вы пока ничего не бронировали.</td></tr>
+            {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</section>
+{% endblock %}
